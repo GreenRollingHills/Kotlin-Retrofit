@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="red">#ff0000</color>
+    <color name="blue">#0000ff</color>
+    <color name="midBlue">#0047a5</color>
+    <color name="transparent">#00FFFFFF</color>
+
+    <color name="nasaRed">#FFfC3D21</color>
+    <color name="nasaBlue">#FF0b3d91</color>
+    <color name="nasaGold">#FFf6c15f</color>
+    <color name="nasaLightBlue">#FFe5fafc</color>
+
+    <color name="darkBlue">#FF000080</color>
+    <color name="neonYellow">#ffffff00</color>
+    <color name="primaryColor">?attr/colorPrimary</color>
+
+
+
+</resources>

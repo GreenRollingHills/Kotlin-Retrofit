@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="sans_serif_style">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/nasaGold</item>
+
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMinTextSize">8sp</item>
+        <item name="autoSizeMaxTextSize">24sp</item>
+        <item name="autoSizeStepGranularity">1sp</item>
+        <item name="maxLines">1</item>
+        <item name="android:ellipsize">none</item>
+<!--
+        <item name="android:gravity">center</item>
+-->
+        <item name="android:textAlignment">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+    </style>
+
+    <style name="sans_serif_style.Large">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="AppTheme.ButtonTodoist" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/nasaRed</item>
+        <item name="android:textColor">@color/white</item>
+
+    </style>
+
+    <style name="AppTheme.ButtonNormal" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/nasaBlue</item>
+        <item name="android:textColor">@color/nasaGold</item>
+
+    </style>
+
+    <style name="AppTheme.textView1" parent="Widget.AppCompat.TextView">
+        <item name="android:background">@color/nasaGold</item>
+        <item name="android:textColorPrimary">@color/black</item>
+
+
+    </style>
+
+
+    <style name="AppTheme.BottomLayoutAsBar" parent="Theme.AppCompat">
+        <item name="android:background">@color/nasaGold</item>
+
+    </style>
+
+
+    <style name="AppTheme.ToolBarStyle" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+
+        <item name="android:background">@color/nasaBlue</item>
+        <item name="android:titleTextAppearance">@style/sans_serif_style</item>
+
+        <!-- Applies to views in their normal state. -->
+        <item name="colorControlNormal">@color/teal_200</item>
+        <!-- Applies to views in their activated state (i.e checked or switches) -->
+        <item name="colorControlActivated">@color/white</item>
+        <!-- Applied to framework control highlights (i.e ripples or list selectors) -->
+        <item name="colorControlHighlight">@color/red</item>
+
+    </style>
+
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <item name="android:colorPrimary">@color/blue</item>
+
+        <!-- android:textColorPrimary is the color of the title text in the Toolbar  -->
+        <item name="android:textColorPrimary">@android:color/holo_blue_light</item>
+        <!-- actionMenuTextColor is the color of the text of action (menu) items  -->
+        <item name="actionMenuTextColor">@android:color/holo_green_light</item>
+        <!-- Tints the input fields like checkboxes and text fields -->
+        <item name="colorAccent">@color/cardview_dark_background</item>
+        <!-- Applies to views in their normal state. -->
+        <item name="colorControlNormal">@color/teal_200</item>
+        <!-- Applies to views in their activated state (i.e checked or switches) -->
+        <item name="colorControlActivated">@color/white</item>
+        <!-- Applied to framework control highlights (i.e ripples or list selectors) -->
+        <item name="colorControlHighlight">@color/red</item>
+
+        <!-- Enable these below if you want clicking icons to trigger a ripple effect -->
+        <!--
+        <item name="selectableItemBackground">?android:selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+        -->
+    </style>
+    
+
+</resources>

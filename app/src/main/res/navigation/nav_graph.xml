@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/welcome">
+
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="site.whiteoffice.todoist.ui.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
+    <fragment
+        android:id="@+id/welcome"
+        android:name="site.whiteoffice.todoist.ui.Welcome.Welcome"
+        android:label="Welcome!"
+        tools:layout="@layout/welcome">
+        <action
+            android:id="@+id/action_welcome_to_imageDump"
+            app:destination="@id/imageDump" />
+        <argument
+            android:name="todoistActionKey"
+            app:argType="site.whiteoffice.todoist.ui.Welcome.Welcome$TodoistAction"
+            android:defaultValue="getCode" />
+        <argument
+            android:name="todoistActionCodeKey"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageDump"
+        android:name="site.whiteoffice.todoist.ui.ImageDump.ImageDump"
+        android:label="PATENT RESULTS"
+        tools:layout="@layout/image_dump_list" >
+        <action
+            android:id="@+id/action_imageDump_to_addTask_projects2"
+            app:destination="@id/addTask_projects" />
+        <action
+            android:id="@+id/action_imageDump_to_patentSummary"
+            app:destination="@id/patentSummary" />
+    </fragment>
+    <fragment
+        android:id="@+id/taskList"
+        android:name="site.whiteoffice.todoist.ui.TaskList.TaskList"
+        android:label="TASKS"
+        tools:layout="@layout/task_list" >
+        <argument
+            android:name="projectID_ARG"
+            app:argType="long" />
+        <argument
+            android:name="nasaData"
+            app:argType="site.whiteoffice.todoist.ui.ImageDump.ImageDumpViewHolderData"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+    <fragment
+        android:id="@+id/addTask_projects"
+        android:name="site.whiteoffice.todoist.ui.ProjectList.ProjectList"
+        android:label="PROJECTS"
+        tools:layout="@layout/project_list" >
+        <action
+            android:id="@+id/action_addTask_projects_to_taskList"
+            app:destination="@id/taskList" />
+        <argument
+            android:name="nasaData"
+            app:argType="site.whiteoffice.todoist.ui.ImageDump.ImageDumpViewHolderData"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+    <fragment
+        android:id="@+id/patentSummary"
+        android:name="site.whiteoffice.todoist.ui.ImageDump.PatentSummary"
+        android:label="PATENT SUMMARY">
+        <action
+            android:id="@+id/action_patentSummary_to_webView"
+            app:destination="@id/webView" />
+        <action
+            android:id="@+id/action_patentSummary_to_addTask_projects"
+            app:destination="@id/addTask_projects" />
+        <argument
+            android:name="nasaData"
+            app:argType="site.whiteoffice.todoist.ui.ImageDump.ImageDumpViewHolderData"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+    <fragment
+        android:id="@+id/webView"
+        android:name="site.whiteoffice.todoist.ui.ImageDump.WebView"
+        android:label="WebView" >
+        <argument
+            android:name="case_number"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
+    </fragment>
+</navigation>
