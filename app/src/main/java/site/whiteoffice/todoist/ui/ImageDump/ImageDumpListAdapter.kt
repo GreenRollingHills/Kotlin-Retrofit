@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,21 +16,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.image_dump_card_view.view.*
+import kotlinx.coroutines.launch
+import site.whiteoffice.todoist.DataClasses.PatentSummary
 import site.whiteoffice.todoist.R
 import site.whiteoffice.todoist.ui.ProjectList.ProjectList
 import site.whiteoffice.todoist.ui.ProjectList.ProjectListListAdapter
-import site.whiteoffice.todoist.ui.ProjectList.ProjectListViewHolderData
 
-class ImageDumpListAdapter (
-    private val context: Context
-) : ListAdapter<ImageDumpViewHolderData, ImageDumpListAdapter.ImageDumpViewHolder> (DiffCallback()) {
+class ImageDumpListAdapter () : ListAdapter<PatentSummary, ImageDumpListAdapter.ImageDumpViewHolder> (DiffCallback()) {
 
     var selectedItem:Int? = null
 
     companion object {
-        const val NASAImageType = 0
-        private val TAG = ProjectList::class.simpleName
-
+        private val TAG = ImageDumpListAdapter::class.simpleName
 
     }
 
@@ -42,33 +40,25 @@ class ImageDumpListAdapter (
             val textView = itemView.patentName
 
             Glide.with(itemView)
-                //.load(data.patentImageUrl)
-                .load(data.patentSummary.patentImageUrl)
+                .load(data.patentImageUrl)
                 .placeholder(R.drawable.nasa_placeholder)
-                .error(site.whiteoffice.todoist.R.drawable.nasa_placeholder)
-
-                //.skipMemoryCache(true)
-                //.diskCacheStrategy(DiskCacheStrategy.NONE)
+                .error(R.drawable.nasa_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                //.transform(CircleCrop())
                 .into(iView)
 
-            //textView.text = ImageDump.removeSpanText(data.patentName)
-            textView.text = ImageDump.removeSpanText(data.patentSummary.patentName)
+            textView.text = ImageDump.removeSpanText(data.patentName)
 
             itemView.toPatentSummaryButton.setOnClickListener {
-                //val action = ImageDumpDirections.actionImageDumpToPatentSummary(data.patentSummary, data.patentCaseNumber)
                 val action = ImageDumpDirections.actionImageDumpToPatentSummary(data)
 
                 itemView.findNavController().navigate(action)
             }
 
-            setColor(position)
+            setColor(itemView.context, position)
         }
 
-        fun setColor(position:Int) {
+        fun setColor(context:Context, position:Int) {
             if(position == selectedItem) {
-                //itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_200))
                 itemView.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.neonYellow))
 
             } else {
@@ -86,26 +76,18 @@ class ImageDumpListAdapter (
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageDumpViewHolder  {
-        return when (viewType) {
-            NASAImageType -> {
-                val view = LayoutInflater.from(context)
-                    .inflate(R.layout.image_dump_card_view, parent, false)
-                //.inflate(R.layout.dummy_card, parent, false)
-                ImageDumpViewHolder(view)
+        Log.d(TAG, "onCreateViewHolder, viewType : $viewType")
 
-            }
-
-            else -> throw IllegalArgumentException("Invalid view type")
-        }
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.image_dump_card_view, parent, false)
+        return ImageDumpViewHolder(view)
     }
     //-----------onCreateViewHolder: bind view with data model---------
     override fun onBindViewHolder(holder: ImageDumpViewHolder, position: Int) {
-        //val data = adapterDataList[position]
-        when (holder) {
-            is ImageDumpViewHolder -> holder.bind(position)
+        Log.d(TAG, "onBindViewHolder")
+        Log.d(TAG, "position : $position")
 
-            else -> throw IllegalArgumentException()
-        }
+        holder.bind(position)
 
         holder.itemView.setOnClickListener {
 
@@ -120,25 +102,24 @@ class ImageDumpListAdapter (
 
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<ImageDumpViewHolderData>() {
 
-        override fun areItemsTheSame(oldItem: ImageDumpViewHolderData, newItem: ImageDumpViewHolderData): Boolean {
-            //return oldItem?.id == newItem?.id
-            Log.d(TAG, "are items same")
-            Log.d(TAG, "old : $oldItem , newItem : $newItem")
-            Log.d(TAG, "return ${oldItem.patentSummary.patentCaseNumber == newItem.patentSummary.patentCaseNumber}")
-            return oldItem.patentSummary.patentCaseNumber == newItem.patentSummary.patentCaseNumber
-            //return false
+    class DiffCallback : DiffUtil.ItemCallback<PatentSummary>() {
+
+        override fun areItemsTheSame(oldItem: PatentSummary, newItem: PatentSummary): Boolean {
+            //Log.d(TAG, "are items same")
+            //Log.d(TAG, "old : $oldItem , newItem : $newItem")
+            //Log.d(TAG, "return ${oldItem.patentCaseNumber == newItem.patentCaseNumber}")
+            return oldItem.patentCaseNumber == newItem.patentCaseNumber
         }
 
         override fun areContentsTheSame(
-            oldItem: ImageDumpViewHolderData,
-            newItem: ImageDumpViewHolderData
+            oldItem: PatentSummary,
+            newItem: PatentSummary
         ): Boolean {
-            Log.d(TAG, "areContentsTheSame")
-            Log.d(TAG, "old : $oldItem , newItem : $newItem")
-            Log.d(TAG, "return ${oldItem.patentSummary.patentCaseNumber == newItem.patentSummary.patentCaseNumber}")
-            return oldItem.patentSummary.patentCaseNumber == newItem.patentSummary.patentCaseNumber
+            //Log.d(TAG, "areContentsTheSame")
+            //Log.d(TAG, "old : $oldItem , newItem : $newItem")
+            //Log.d(TAG, "return ${oldItem.patentCaseNumber == newItem.patentCaseNumber}")
+            return oldItem.patentCaseNumber == newItem.patentCaseNumber
         }
 
     }

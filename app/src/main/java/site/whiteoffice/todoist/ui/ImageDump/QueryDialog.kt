@@ -17,16 +17,7 @@ class QueryDialog:DialogFragment() {
 
     companion object {
 
-        const val tag = "QueryDialog"
-        //val lastQueryKey = "lastQueryKey"
-
-        fun newInstance(): QueryDialog {
-            val args = Bundle()
-
-            val fragment = QueryDialog()
-            fragment.arguments = args
-            return fragment
-        }
+        private val TAG = QueryDialog::class.java.simpleName
 
     }
 
@@ -53,8 +44,6 @@ class QueryDialog:DialogFragment() {
     }
 
     private fun setupView(view: View) {
-        //view.tvTitle.text = arguments?.getString(KEY_TITLE)
-        //view.tvSubTitle.text = arguments?.getString(KEY_SUBTITLE)
         view.queryTitle.text = "What do you want to search?"
     }
 
@@ -63,18 +52,13 @@ class QueryDialog:DialogFragment() {
 
         val query = view?.queryEditText?.text.toString()
 
-        //val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
-        //sharedPref?.edit()?.putString(lastQueryKey, query)?.apply()
-
         setLastQuery(activity, query)
 
         val dumper = parentFragment as ImageDump
         dumper.setCurrentQueryTitle(query)
 
-        dumper.data.loadPatents(dumper.view?.pBar, query)
-
-        //val mainActivity = activity as MainActivity
-        //mainActivity.updateToolBarTitleForImageDump()
+        //dumper.data.loadPatents(dumper.view?.pBar, query)
+        dumper.data.loadPatents(query)
 
 
     }

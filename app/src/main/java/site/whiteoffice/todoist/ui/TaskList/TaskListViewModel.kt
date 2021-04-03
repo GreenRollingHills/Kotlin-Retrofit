@@ -2,9 +2,8 @@ package site.whiteoffice.todoist.ui.TaskList
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -15,10 +14,9 @@ import site.whiteoffice.todoist.Repository.TodoistRepository
 
 class TaskListViewModel(
     application: Application,
-    private val projectID: Long
+    private val projectID: Long/*,
+    private val savedStateHandle: SavedStateHandle*/
 ):AndroidViewModel(application) {
-
-
 
     private var repo: TodoistRepository = TodoistRepository(application)
 
@@ -28,10 +26,20 @@ class TaskListViewModel(
         private val TAG = TaskListViewModel::class.java.simpleName
     }
 
+    private var spinnerStatus = MutableLiveData<Boolean>(false)
+
+    fun getSpinnerStatusLiveData () : LiveData<Boolean> {
+        return spinnerStatus
+    }
+
+    fun setSpinnerStatus (boolean: Boolean) {
+        spinnerStatus.value = boolean
+    }
+
     private val callbackLoadTasks = object : Callback<List<Task>> {
         override fun onFailure(call: Call<List<Task>>?, t: Throwable?) {
-            Log.e(TAG, "api issue : ${t?.message}")
-
+            Log.e(TAG, "callbackLoadTasks, api issue : ${t?.message}")
+            //TODO : implement error handling
 
         }
 
@@ -42,11 +50,8 @@ class TaskListViewModel(
                 val list = response?.body()
                 if (list != null) {
                     viewModelScope.launch {
-                        /*TODO instead of deleting all tasks before inserting all tasks I should
-                        *  delete/update just one task at a time */
-
-                        //AppDatabase.getInstance(getApplication()).todoistDao.deleteAllTasks()
-                        //AppDatabase.getInstance(getApplication()).todoistDao.insertAll(*list.toTypedArray())
+                        /* TODO : don't delete all tasks right before I cache all tasks.
+                            The best way to do this is probably to use ToDoist's synch api. */
 
                         repo.deleteAllTasksInRoomDB()
                         repo.cacheAllTasks(list)
@@ -58,33 +63,41 @@ class TaskListViewModel(
 
 
     fun loadTasks () {
-        repo.getTasks(projectID, callbackLoadTasks)
+        //repo.getTasks(projectID, callbackLoadTasks)
+        //TODO : implement error handling per app requirements
+        setSpinnerStatus(true)
+
+        val errorHandler = CoroutineExceptionHandler { _, exception ->
+            setSpinnerStatus(false)
+
+        }
+
+        viewModelScope.launch (errorHandler) {
+            val response = repo.getTasks(projectID)
+
+            response.body()?.let { list ->
+                /* TODO : don't delete all tasks right before I cache all tasks.
+                The best way to do this is probably to use ToDoist's synch api. */
+
+                repo.deleteAllTasksInRoomDB()
+                repo.cacheAllTasks(list)
+            }
+
+
+            setSpinnerStatus(false)
+
+        }
     }
 
-    //    fun getTasks (projectID:Long): LiveData<List<Task>> {
     fun getTasksLiveData (): LiveData<List<Task>> {
-        //return AppDatabase.getInstance(getApplication()).todoistDao.getTasksFor(projectID)
-        //return repo.getCachedProjects(getApplication())
         return repo.getTasksLiveData(projectID)
     }
 
-    /*fun setRecyclerViewList (list:List<Task>) {
-        println("setRecyclerViewList")
-        this.list.clear()
-
-        for (t in list) {
-            println("t : $t")
-            println("t content : ${t.content}")
-
-            val holder = TaskListViewHolderData(TaskListAdapter.TaskType, t)
-            this.list.add(holder)
-        }
-    }*/
 
     private val callbackDeleteTask = object : Callback<ResponseBody> {
         override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
-            Log.e(TAG, "api issue : ${t?.message}")
-
+            Log.e(TAG, "callbackDeleteTask, api issue : ${t?.message}")
+            //TODO : implement error handling
 
         }
 
@@ -92,13 +105,9 @@ class TaskListViewModel(
             response?.isSuccessful.let {
                 Log.d(TAG, "response body : ${response?.body()}")
                 Log.d(TAG, "error body ${response?.errorBody()}")
-                viewModelScope.launch {
-                    //TodoistDatabase.getInstance(getApplication()).projectDao.deleteAllTasks()
-                    //loadTasks()
-                    repo.getTasks(projectID, callbackLoadTasks)
 
-
-                }
+                //repo.getTasks(projectID, callbackLoadTasks)
+                loadTasks()
 
             }
 
@@ -108,12 +117,27 @@ class TaskListViewModel(
 
 
     fun deleteTask (id:String) {
-        repo.deleteTask(id, callbackDeleteTask)
+        //repo.deleteTask(id, callbackDeleteTask)
+        //TODO : implement error handling per app requirements
+        setSpinnerStatus(true)
+
+        val errorHandler = CoroutineExceptionHandler { _, exception ->
+            setSpinnerStatus(false)
+
+        }
+
+        viewModelScope.launch (errorHandler) {
+            val response = repo.deleteTask(id)
+            loadTasks()
+            setSpinnerStatus(false)
+
+        }
     }
 
     private val callbackCreateTask = object : Callback<Task> {
         override fun onFailure(call: Call<Task>?, t: Throwable?) {
-            Log.e(TAG, "api issue : ${t?.message}")
+            Log.e(TAG, "callbackCreateTask, api issue : ${t?.message}")
+            //TODO : implement error handling
 
         }
 
@@ -139,12 +163,30 @@ class TaskListViewModel(
     }
 
     fun createTask(task: Task) {
-        repo.createTask(task, callbackCreateTask)
+        //repo.createTask(task, callbackCreateTask)
+        //TODO : implement error handling per app requirements
+        setSpinnerStatus(true)
+
+        val errorHandler = CoroutineExceptionHandler { _, exception ->
+            setSpinnerStatus(false)
+
+        }
+
+        viewModelScope.launch(errorHandler) {
+            val response = repo.createTask(task)
+            response.body()?.let { task ->
+                repo.cacheTasks(task)
+
+            }
+            setSpinnerStatus(false)
+
+        }
     }
 
     private val callbackCloseTask = object : Callback<ResponseBody> {
         override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
-            Log.e(TAG, "api issue : ${t?.message}")
+            Log.e(TAG, "callbackCloseTask, api issue : ${t?.message}")
+            //TODO : implement error handling
 
         }
 
@@ -154,13 +196,8 @@ class TaskListViewModel(
                 Log.d(TAG, "response body : ${response?.body()}")
                 Log.d(TAG, "error body ${response?.errorBody()}")
 
-                viewModelScope.launch {
-                    //TodoistDatabase.getInstance(getApplication()).projectDao.deleteAllTasks()
-                    //loadTasks()
-                    repo.getTasks(projectID, callbackLoadTasks)
-
-
-                }
+                //repo.getTasks(projectID, callbackLoadTasks)
+                loadTasks()
 
 
             }
@@ -169,6 +206,20 @@ class TaskListViewModel(
     }
 
     fun closeTask(taskID: String) {
-        repo.closeTask(taskID, callbackCloseTask)
+        //repo.closeTask(taskID, callbackCloseTask)
+        //TODO : implement error handling per app requirements
+        setSpinnerStatus(true)
+
+        val errorHandler = CoroutineExceptionHandler { _, exception ->
+            setSpinnerStatus(false)
+
+        }
+
+        viewModelScope.launch (errorHandler) {
+            val response = repo.closeTask(taskID)
+            loadTasks()
+            setSpinnerStatus(false)
+
+        }
     }
 }

@@ -9,7 +9,7 @@ import site.whiteoffice.todoist.Dao.NASADao
 import site.whiteoffice.todoist.Dao.TodoistDao
 import site.whiteoffice.todoist.DataClasses.*
 
-@Database(entities = [Project::class, Task::class, PatentSummary::class, PatentIDResults::class], version = 7, exportSchema = false)
+@Database(entities = [Project::class, Task::class, PatentSummary::class], version = 8, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 

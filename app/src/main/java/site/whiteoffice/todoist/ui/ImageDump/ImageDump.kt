@@ -19,24 +19,16 @@ import site.whiteoffice.todoist.R
 import site.whiteoffice.todoist.PersistentStorage.getLastQuery
 import site.whiteoffice.todoist.ui.ProjectList.ProjectList
 import site.whiteoffice.todoist.ui.ProjectList.ProjectListListAdapter
-import site.whiteoffice.todoist.ui.ProjectList.ProjectListViewHolderData
 import site.whiteoffice.todoist.ui.ProjectList.ProjectListViewModel
 
 
-class ImageDump : Fragment()/*, ImageDumpAdapter.FragmentDelegate */ {
-
+class ImageDump : Fragment() {
 
     val data by viewModels<ImageDumpViewModel>()
 
     companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ImageDump().apply {
-                arguments = Bundle().apply {
-                    //putString(ARG_PARAM1, param1)
-                    //putString(ARG_PARAM2, param2)
-                }
-            }
+
+        private val TAG = ImageDump::class.java.simpleName
 
         fun removeSpanText(string:String):String {
             val string1 = string.replace("</span>", "")
@@ -70,43 +62,47 @@ class ImageDump : Fragment()/*, ImageDumpAdapter.FragmentDelegate */ {
             displayQueryDialog()
         }
 
-        val adapter = context?.let { ImageDumpListAdapter(it) }
+        val adapter = ImageDumpListAdapter()
+        recyclerView2.adapter = adapter
+        recyclerView2.layoutManager = LinearLayoutManager(context)
+
+        data.getSpinnerStatusLiveData().observe(viewLifecycleOwner, Observer { bool ->
+            view.pBar.visibility = if (bool) View.VISIBLE else View.INVISIBLE
+
+        })
 
         data.getPatentList().observe(viewLifecycleOwner, Observer { list ->
 
-            view.pBar.visibility = View.INVISIBLE
-            val newList = returnAdapterData(list)
-            adapter?.submitList(newList)
+            Log.d(TAG, "list : $list")
+            adapter.submitList(list) {
+                //view.pBar.visibility = View.INVISIBLE
+                data.setSpinnerStatus(false)
+                (recyclerView2.layoutManager as LinearLayoutManager).scrollToPosition(0)
 
-            /*if (recyclerView2.adapter == null) {
-                recyclerView2.adapter = context?.let { ImageDumpAdapter(it, list) }
-            } else {
-                val adapter = recyclerView2.adapter as ImageDumpAdapter
-                adapter.updateList(list)
-            }*/
+            }
 
 
         })
 
-        recyclerView2.layoutManager = LinearLayoutManager(context)
+        Log.d(TAG, "test value : ${data.getTest()}")
 
         val lastQuery =
             getLastQuery(activity)
+        Log.d(TAG, "lastQuery : $lastQuery")
         if (lastQuery != null) {
             setCurrentQueryTitle(lastQuery)
-            data.loadPatents(view.pBar, lastQuery)
+            //data.loadPatents(view.pBar, lastQuery)
+            data.loadPatents(lastQuery)
+
         }
 
     }
 
     private fun newTaskAction () {
 
-        //val adapter = recyclerView2.adapter as ImageDumpAdapter
         val adapter = recyclerView2.adapter as ImageDumpListAdapter
         val selectedItem = adapter.selectedItem
-        //        if (adapter.selected_item != null) {
         if (selectedItem != null) {
-            //val nasaData = data.getPatentList().value?.get(adapter.selected_item!!)
             val nasaData = adapter.currentList[selectedItem]
             val action = ImageDumpDirections.actionImageDumpToAddTaskProjects2(nasaData)
             view?.findNavController()?.navigate(action)
@@ -116,25 +112,12 @@ class ImageDump : Fragment()/*, ImageDumpAdapter.FragmentDelegate */ {
     }
 
     private fun displayQueryDialog () {
-        QueryDialog.newInstance().show(this.childFragmentManager, QueryDialog::class.simpleName)
+        QueryDialog().show(this.childFragmentManager, QueryDialog::class.simpleName)
 
     }
 
     fun setCurrentQueryTitle (string:String) {
         currentQuery.text = "Searching for : $string"
-    }
-
-    fun returnAdapterData(list: List<PatentSummary>):MutableList<ImageDumpViewHolderData> {
-
-        val mutableList = mutableListOf<ImageDumpViewHolderData>()
-
-        for (i in list.indices) {
-            val p = list[i]
-            val data = ImageDumpViewHolderData(ImageDumpListAdapter.NASAImageType, p)
-            mutableList.add(data)
-        }
-
-        return mutableList
     }
 
 

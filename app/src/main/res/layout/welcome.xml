@@ -7,8 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.Welcome.Welcome">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <Button
         android:id="@+id/loginButton"
         android:theme="@style/AppTheme.ButtonTodoist"

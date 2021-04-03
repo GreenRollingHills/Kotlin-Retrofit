@@ -2,12 +2,8 @@ package site.whiteoffice.todoist.ui.ImageDump
 
 import android.app.Application
 import android.util.Log
-import android.view.View
-import android.widget.ProgressBar
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
+import androidx.lifecycle.*
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,13 +12,11 @@ import site.whiteoffice.todoist.DataClasses.PatentSummaryResults
 import site.whiteoffice.todoist.Repository.NASARepository
 
 class ImageDumpViewModel (
-    application: Application
+    application: Application,
+    private val savedStateHandle: SavedStateHandle
 ):AndroidViewModel(application) {
 
     private var repo: NASARepository = NASARepository(application)
-
-    //private var list = MutableLiveData<List<ImageDumpViewHolderData>>()
-
 
     companion object {
         private val TAG = ImageDumpViewModel::class.simpleName
@@ -30,17 +24,44 @@ class ImageDumpViewModel (
 
     }
 
-    //    fun getPatentList ():LiveData<List<ImageDumpViewHolderData>> {
+    fun getTest ():Int? {
+        var result = savedStateHandle.get<Int>("key")
+        if (result == null) {
+            result = 0
+        } else {
+            result += 1
+        }
+
+        savedStateHandle.set("key", result)
+        return savedStateHandle.get("key")
+
+    }
+
+    private var spinnerStatus = MutableLiveData<Boolean>(false)
+
+    fun getSpinnerStatusLiveData () : LiveData<Boolean> {
+        return spinnerStatus
+    }
+
+    fun setSpinnerStatus (boolean: Boolean) {
+        spinnerStatus.value = boolean
+    }
+
     fun getPatentList ():LiveData<List<PatentSummary>> {
-        //return list
         return repo.getPatentSummariesLiveData()
     }
 
     private val callback = object : Callback<PatentSummaryResults> {
         override fun onFailure(call: Call<PatentSummaryResults>?, t: Throwable?) {
-            //Log.e("MainActivity", "Problem calling todoist API ${t?.message}")
-            Log.e(TAG, "nasa api issue : ${t?.message}")
-            //println("call result : $call")
+            Log.e(TAG, "callback, api issue : ${t?.message}")
+            //TODO : implement error handling
+
+            if (call != null && call.isCanceled) {
+
+            } else {
+
+            }
+
 
 
         }
@@ -50,51 +71,68 @@ class ImageDumpViewModel (
                 Log.d(TAG, "response body : ${response?.body()}")
 
 
-                //val tempList = mutableListOf<ImageDumpViewHolderData>()
-
                 response?.body()?.results?.let {results ->
 
                     viewModelScope.launch {
                         val tempList = mutableListOf<PatentSummary>()
                         for (patent in results) {
-                            /*for (j in patent.indices) {
-                                val data = patent[j]
-                                Log.d(TAG, "data : $data")
-                            }*/
-
-                            //Log.d(TAG, "patent[patent.size-2] : ${patent[patent.size-3]}")
 
                             val data = PatentSummary(patent[2],
                                 patent[patent.size-3], patent[3], patent[1])
 
                             tempList.add(data)
 
-
-                            //val data = ImageDumpViewHolderData(ImageDumpAdapter.NASAImageType, patent[2],
-                            //patent[patent.size-3], patent[3], patent[1])
-                            //tempList.add(data)
-
                         }
-
+                        Log.d(TAG, "tempList after : $tempList")
                         repo.removeAllPatentSummariesFromRoomDB()
                         repo.cachePatentSummaries(tempList)
                     }
 
-                    //Log.d(TAG, "size : ${results.size}")
-                    //Log.d(tag, "first.size : ${results.first().size}")
 
                 }
 
-                //list.value = tempList
 
             }
 
         }
     }
 
-    fun loadPatents (spinner: ProgressBar?, keyword:String) {
-        spinner?.visibility = View.VISIBLE
-        repo.getPatentSummaryResults(keyword, callback)
+    //    fun loadPatents (spinner: ProgressBar?, keyword:String) {
+    fun loadPatents (keyword:String) {
+        //spinner?.visibility = View.VISIBLE
+        //repo.getPatentSummaryResults(keyword, callback)
+        //TODO : implement error handling per app requirements
+
+        setSpinnerStatus(true)
+
+        val errorHandler = CoroutineExceptionHandler { _, exception ->
+            Log.d(TAG, "imageDumpVM, error : ${exception.localizedMessage}")
+            setSpinnerStatus(false)
+        }
+
+
+        viewModelScope.launch (errorHandler) {
+            val response = repo.getPatentSummaryResults(keyword)
+            Log.d(TAG, "loadPatents response code : ${response.code()}")
+            response.body()?.results?.let { list ->
+                val tempList = mutableListOf<PatentSummary>()
+                for (patent in list) {
+
+                    val data = PatentSummary(patent[2],
+                        patent[patent.size-3], patent[3], patent[1])
+
+                    tempList.add(data)
+
+                }
+                Log.d(TAG, "tempList after : $tempList")
+                repo.removeAllPatentSummariesFromRoomDB()
+                repo.cachePatentSummaries(tempList)
+            }
+            setSpinnerStatus(false)
+
+
+
+        }
     }
 
 }

@@ -19,12 +19,14 @@ import site.whiteoffice.todoist.DataClasses.Task
 import site.whiteoffice.todoist.R
 import site.whiteoffice.todoist.ui.ImageDump.ImageDump
 import site.whiteoffice.todoist.ui.TaskListViewModelFactory
-
+import androidx.fragment.app.viewModels
+import kotlinx.android.synthetic.main.image_dump_list.view.*
+import kotlinx.android.synthetic.main.task_list.view.pBar
 
 
 class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
 
-    private var projectID:Long = -1
+    //private var projectID:Long = -1
 
     //lateinit var data: TaskListViewModel
 
@@ -34,17 +36,14 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
 
     val args:TaskListArgs by navArgs()
 
+    /*val model by viewModels<TaskListViewModel> {
+        //MyViewModelFactory(this, args.myId)
+        TaskListViewModelFactory(this, application, args.projectIDARG)
+    }*/
+
     companion object {
 
         private val TAG = TaskList::class.java.simpleName
-
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TaskList().apply {
-                arguments = Bundle().apply {
-
-                }
-            }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,11 +52,15 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
 
         }
 
-        projectID = args.projectIDARG
+        //projectID = args.projectIDARG
 
         val application = activity?.application
         if (application != null) {
-            data = ViewModelProvider(this, TaskListViewModelFactory(application, projectID)).get(TaskListViewModel::class.java)
+            data = ViewModelProvider(this, TaskListViewModelFactory(application, args.projectIDARG)).get(TaskListViewModel::class.java)
+            //data = ViewModelProvider(this, TaskListViewModelFactory(this,application,args.projectIDARG)).get(TaskListViewModel::class.java)
+
+
+
         }
 
     }
@@ -72,22 +75,26 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.pBar.visibility = View.INVISIBLE
+        //view.pBar.visibility = View.INVISIBLE
 
         view.createTaskButton.setOnClickListener {
             createTaskAction()
         }
 
 
-        val adapter = context?.let { TaskListListAdapter(it, this) }
+        val adapter = TaskListListAdapter(this)
 
+        data?.getSpinnerStatusLiveData()?.observe(viewLifecycleOwner, Observer { bool ->
+            view.pBar.visibility = if (bool) View.VISIBLE else View.INVISIBLE
+
+        })
         //        data.getTasks(projectID).observe(viewLifecycleOwner, Observer { list ->
         data?.getTasksLiveData()?.observe(viewLifecycleOwner, Observer { list ->
 
             Log.d(TAG, "taskList, onViewCreated, list : $list")
-            view.pBar.visibility = View.INVISIBLE
-            val newList = returnAdapterData(list)
-            adapter?.submitList(newList)
+            //view.pBar.visibility = View.INVISIBLE
+            //val newList = returnAdapterData(list)
+            adapter.submitList(list)
 
 
             /*data.setRecyclerViewList(list)
@@ -111,8 +118,8 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
             DividerItemDecoration.VERTICAL)
         )
 
-        if (savedInstanceState != null) {
-            view.pBar.visibility = View.VISIBLE
+        if (savedInstanceState == null) {
+            //view.pBar.visibility = View.VISIBLE
             data?.loadTasks()
         }
     }
@@ -122,7 +129,7 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
         builder?.setTitle("Are you sure you want to delete?")
 
         builder?.setPositiveButton(android.R.string.yes) { dialog, which ->
-            view?.pBar?.visibility = View.VISIBLE
+            //view?.pBar?.visibility = View.VISIBLE
             data?.deleteTask(taskID)
 
         }
@@ -137,7 +144,7 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
     private fun createTaskAction () {
 
         //val patentName = args.nasaData?.patentName
-        val patentName = args.nasaData?.patentSummary?.patentName
+        val patentName = args.nasaData?.patentName
 
         var content = "?"
         if (patentName != null) {
@@ -149,7 +156,9 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
             content = "Study $content",
             comment_count = null,
             id = null,
-            project_id = projectID,
+            //project_id = projectID,
+            project_id = args.projectIDARG,
+
             section_id = null,
             parent_id = null,
             order = null,
@@ -166,25 +175,26 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
     }
 
     override fun startSpinner() {
-        view?.pBar?.visibility = View.VISIBLE
+        //view?.pBar?.visibility = View.VISIBLE
+        data?.setSpinnerStatus(true)
     }
 
     /*override fun stopSpinner() {
         view?.pBar?.visibility = View.INVISIBLE
     }*/
 
-    fun returnAdapterData(list:List<Task>):MutableList<TaskListViewHolderData> {
+    /*fun returnAdapterData(list:List<Task>):MutableList<TaskListViewHolderData> {
 
         val mutableList = mutableListOf<TaskListViewHolderData>()
 
         for (t in list) {
 
-            val data = TaskListViewHolderData(TaskListAdapter.TaskType, t)
+            val data = TaskListViewHolderData(TaskListListAdapter.TaskType, t)
             mutableList.add(data)
         }
 
         return mutableList
-    }
+    }*/
 
 
 }

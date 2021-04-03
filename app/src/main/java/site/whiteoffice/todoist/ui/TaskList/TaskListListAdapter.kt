@@ -10,20 +10,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.task_list_view_holder.view.*
+import site.whiteoffice.todoist.DataClasses.Task
 import site.whiteoffice.todoist.R
 import site.whiteoffice.todoist.ui.ProjectList.ProjectListListAdapter
-import site.whiteoffice.todoist.ui.ProjectList.ProjectListViewHolderData
 
 class TaskListListAdapter (
-    private val context: Context,
     private var dataDelegate: DataDelegate
-) : ListAdapter<TaskListViewHolderData, TaskListListAdapter.TaskViewHolder> (DiffCallback()) {
+) : ListAdapter<Task, TaskListListAdapter.TaskViewHolder> (DiffCallback()) {
 
 
     companion object {
         private val TAG = TaskListListAdapter::class.java.simpleName
-
-        const val TaskType = 0
 
     }
 
@@ -31,7 +28,6 @@ class TaskListListAdapter (
         fun presentAreYouSureAlert(taskID:String)
         fun closeTask(taskID: String)
         fun startSpinner()
-        //fun stopSpinner()
     }
 
     inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -39,11 +35,11 @@ class TaskListListAdapter (
         fun bind(position: Int) {
             val data = getItem(position)
             val textView = itemView.findViewById<TextView>(R.id.taskContent)
-            textView.text = data.task.content
+            textView.text = data.content
 
             itemView.taskCompletionCheckBox.setOnClickListener {
                 if (itemView.taskCompletionCheckBox.isChecked) {
-                    val id = data.task.id
+                    val id = data.id
                     if (id != null) {
                         dataDelegate.startSpinner()
                         dataDelegate.closeTask(id.toString())
@@ -53,56 +49,42 @@ class TaskListListAdapter (
             }
 
             itemView.deleteTaskButton.setOnClickListener {
-                dataDelegate.presentAreYouSureAlert(data.task.id.toString())
+                dataDelegate.presentAreYouSureAlert(data.id.toString())
             }
 
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder  {
-        return when (viewType) {
-            TaskType -> {
-                val view = LayoutInflater.from(context)
-                    .inflate(R.layout.task_list_view_holder, parent, false)
-                TaskViewHolder(view)
-            }
 
-            else -> throw IllegalArgumentException("Invalid view type")
-        }
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.task_list_view_holder, parent, false)
+        return TaskViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        when (holder) {
-            is TaskListListAdapter.TaskViewHolder -> holder.bind(position)
 
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return getItem(position).listViewType
+        holder.bind(position)
 
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<TaskListViewHolderData>() {
+    class DiffCallback : DiffUtil.ItemCallback<Task>() {
 
-        override fun areItemsTheSame(oldItem: TaskListViewHolderData, newItem: TaskListViewHolderData): Boolean {
-            //return oldItem?.id == newItem?.id
+        override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
             Log.d(TAG, "are items same")
             Log.d(TAG, "old : $oldItem , newItem : $newItem")
-            Log.d(TAG, "return ${oldItem.task.id == newItem.task.id}")
-            return oldItem.task.id == newItem.task.id
-            //return false
+            Log.d(TAG, "return ${oldItem.id == newItem.id}")
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: TaskListViewHolderData,
-            newItem: TaskListViewHolderData
+            oldItem: Task,
+            newItem: Task
         ): Boolean {
             Log.d(TAG, "areContentsTheSame")
             Log.d(TAG, "old : $oldItem , newItem : $newItem")
-            Log.d(TAG, "return ${oldItem.task.content == newItem.task.content}")
-            return oldItem.task.content== newItem.task.content
+            Log.d(TAG, "return ${oldItem.content == newItem.content}")
+            return oldItem.content== newItem.content
         }
 
     }

@@ -7,16 +7,6 @@ import kotlinx.android.parcel.Parcelize
 
 data class RepoResult(val projects: List<Project>)
 
-/*data class Item(
-        val id: Long?,
-        val name: String?,
-        val fullName: String?,
-        val owner: Owner,
-        val private: Boolean,
-        val htmlUrl: String?,
-        val description: String?)*/
-
-//@Entity(tableName = "daily_sleep_quality_table")
 @Entity()
 data class Project(
         @PrimaryKey val id: Long,
@@ -66,34 +56,22 @@ data class PatentSummary(
 
 
 data class PatentSummaryResults (
-        //@PrimaryKey val results: List<List<String>>?,
-        //@PrimaryKey val dummy: List<List<String>>?,
         val results: List<List<String>>?,
 
         val count: Int,
         val total: Int,
         val perpage: Int,
         val page: Int) {
-
-
-        /*override fun toString(): String {
-                return "results : $results"
-        }*/
 }
 
-@Entity()
+
 data class PatentIDResults (
         @PrimaryKey(autoGenerate = true) val id: Long,
         val results:List<PatentID>
         ) {
-
-
-        /*override fun toString(): String {
-                return "results : $results"
-        }*/
 }
 
-@Entity()
+
 data class PatentID (
         val id:String,
         val _id:String,
@@ -115,16 +93,12 @@ data class PatentID (
         val license_term:String,
         val evaluation_fee:String,
         val evaluation_lic_term:String
-        /*val case_numbers:String*/
 ) {
 
 
-        /*override fun toString(): String {
-                return "results : $results"
-        }*/
 }
 
-@Entity()
+
 data class AuthData (
         val access_token:String,
         val token_type:String
@@ -133,19 +107,3 @@ data class AuthData (
 }
 
 
-
-
-/*data class Item (
-        val userID: Int?,
-        val id: Int?,
-        val title: String?,
-        //@SerializedName("body")
-        val text: String?) {
-
-
-        override fun toString(): String {
-                return "userID: $userID id : $id, title : $title, text : $text"
-        }
-}*/
-
-//data class Owner(val login: String?, val id: Long?, val avatarUrl: String?)

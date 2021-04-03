@@ -12,8 +12,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.image_dump_list.view.*
 import kotlinx.android.synthetic.main.project_list.*
 import kotlinx.android.synthetic.main.project_list.view.*
+import kotlinx.android.synthetic.main.project_list.view.pBar
 import site.whiteoffice.todoist.DataClasses.Project
 //import kotlinx.android.synthetic.main.add_task_projects.*
 import site.whiteoffice.todoist.R
@@ -29,13 +31,6 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
     companion object {
 
         private val TAG = ProjectList::class.simpleName
-        @JvmStatic
-        fun newInstance() =
-                ProjectList().apply {
-                    arguments = Bundle().apply {
-
-                    }
-                }
 
     }
 
@@ -59,14 +54,20 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
             newProjectButtonAction()
         }
 
-        val adapter = context?.let {ProjectListListAdapter(it, this)}
+        //val adapter = context?.let {ProjectListListAdapter(it, this)}
+        val adapter = ProjectListListAdapter(this)
+
+        data.getSpinnerStatusLiveData().observe(viewLifecycleOwner, Observer { bool ->
+            view.pBar.visibility = if (bool) View.VISIBLE else View.INVISIBLE
+
+        })
 
         data.getProjects().observe(viewLifecycleOwner, Observer { list ->
             Log.d(TAG, "onViewCreated, list : $list")
 
-            view.pBar.visibility = View.INVISIBLE
-            val newList = returnAdapterData(list)
-            adapter?.submitList(newList)
+            //view.pBar.visibility = View.INVISIBLE
+            //val newList = returnAdapterData(list)
+            adapter?.submitList(list)
 
 
             /*data.setRecyclerViewList(list)
@@ -87,7 +88,7 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
         projectListRV.addItemDecoration(DividerItemDecoration(context,
             DividerItemDecoration.VERTICAL))
 
-        view.pBar.visibility = View.VISIBLE
+        //view.pBar.visibility = View.VISIBLE
 
         Log.d(TAG, "ProjectList, savedInstanceState : $savedInstanceState")
         if (savedInstanceState == null) {
@@ -98,7 +99,7 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
     }
 
     private fun newProjectButtonAction () {
-        NewProjectDialog.newInstance().show(this.childFragmentManager, NewProjectDialog::class.simpleName)
+        NewProjectDialog().show(this.childFragmentManager, NewProjectDialog::class.simpleName)
 
 
     }
@@ -108,7 +109,7 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
         view?.findNavController()?.navigate(action)
     }
 
-    fun returnAdapterData(list: List<Project>):MutableList<ProjectListViewHolderData> {
+    /*fun returnAdapterData(list: List<Project>):MutableList<ProjectListViewHolderData> {
 
         val mutableList = mutableListOf<ProjectListViewHolderData>()
 
@@ -121,7 +122,7 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
         }
 
         return mutableList
-    }
+    }*/
 
 
 

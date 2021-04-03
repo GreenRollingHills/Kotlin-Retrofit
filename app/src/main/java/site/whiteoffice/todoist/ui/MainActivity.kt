@@ -1,36 +1,43 @@
 package site.whiteoffice.todoist.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
+import android.view.View
+import androidx.activity.viewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import androidx.navigation.ui.navigateUp
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.*
+import site.whiteoffice.todoist.BuildConfig
 import site.whiteoffice.todoist.R
 import site.whiteoffice.todoist.PersistentStorage.getTokenFromSharedPreferences
+import site.whiteoffice.todoist.PersistentStorage.testMethodRemoveToken
 import site.whiteoffice.todoist.ui.Welcome.Welcome
+import site.whiteoffice.todoist.ui.Welcome.WelcomeViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private val tag = MainActivity::class.java.simpleName
 
+    val connectivityManager by viewModels<ConnectivityManagerCustom>()
 
-
-    //private val repo = RepositoryRetriever()
 
     companion object {
-        val secretString = "secretString"
-        //var token = ""
-        //val accessTokenKey = "accessTokenKey"
-        //val sharedPreferenceName = "myPref"
-
-        val todoistActionKey = "todoistActionKey"
-        val todoistActionCodeKey = "todoistActionCodeKey"
+        private val TAG = MainActivity::class.java.simpleName
+        //val todoistActionKey = "todoistActionKey"
+        const val welcomeLoginStatusKey = "welcomeLoginStatusKey"
+        const val todoistActionCodeKey = "todoistActionCodeKey"
 
     }
 
@@ -40,100 +47,87 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        println("main activity, onCreate")
-
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navHostID) as NavHostFragment
         val navController = navHostFragment.navController
 
-        Log.d(tag, "intent : $intent")
+        Log.d(TAG, "intent : $intent")
 
         val bundle = Bundle()
 
         if (intent != null && intent.action == Intent.ACTION_MAIN) {
             //testMethodRemoveToken(application)
-            //val tokenStored = Welcome.TodoistAction.getToken()
             val tokenStored =
                 getTokenFromSharedPreferences(
                     application
                 )
-            println("tokenStored : $tokenStored")
             if (tokenStored == null) {
-                bundle.putInt(todoistActionKey, Welcome.TodoistAction.getCode.raw)
+                //bundle.putInt(todoistActionKey, Welcome.TodoistAction.getCode.raw)
+                bundle.putInt(welcomeLoginStatusKey, WelcomeViewModel.LoginStatus.NeedCode.raw)
 
             } else {
-                bundle.putInt(todoistActionKey, Welcome.TodoistAction.start.raw)
+                //bundle.putInt(todoistActionKey, Welcome.TodoistAction.start.raw)
+                bundle.putInt(welcomeLoginStatusKey, WelcomeViewModel.LoginStatus.HaveToken.raw)
 
             }
 
         } else if (intent != null && intent.action == Intent.ACTION_VIEW) { //category = BROWSABLE
-            bundle.putInt(todoistActionKey, Welcome.TodoistAction.getToken.raw)
+            //bundle.putInt(todoistActionKey, Welcome.TodoistAction.getToken.raw)
+            bundle.putInt(welcomeLoginStatusKey, WelcomeViewModel.LoginStatus.NeedTokenActive.raw)
             handleIntent(intent, bundle)
 
         }
         navController.setGraph(R.navigation.nav_graph, bundle)
 
         appBarConfiguration = AppBarConfiguration(navController.graph)
-        //setupActionBarWithNavController(navController, appBarConfiguration)
 
 
         val toolBar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.my_toolbar)
-        //setSupportActionBar(toolBar)
         setupWithNavController(toolBar, navController)
-        //toolBar.setTitleTextAppearance(this, R.style.sans_serif_style)
 
-        navController.addOnDestinationChangedListener {navCon, des, arg ->
-            println("navController, OnDestinationChangedListener")
-            println("des id : ${des.id}")
-            println("des display name : ${des.label}")
-            //toolBar.setNavigationIcon(R.drawable.ic_launcher_background)
 
-            /*if (des.id == R.id.imageDump) {
-                updateToolBarTitleForImageDump()
-            } else {
-                my_toolbar.title = des.label
-                my_toolbar.toolBarTextView.text = ""
-
-            }*/
-
+        lifecycleScope.launch(Dispatchers.Default) {
+            Glide.get(applicationContext).clearDiskCache()
         }
+
+
 
     }
 
-    /*fun updateToolBarTitleForImageDump () {
-        val sharedPref = getPreferences(Context.MODE_PRIVATE)
-        val lastQuery = sharedPref?.getString(QueryDialog.lastQueryKey, "computer")
-        println("lastQuery : $lastQuery")
-        if (lastQuery != null) {
-            //des.label = "$lastQuery PATENT RESULTS"
-            //supportActionBar?.title = "$lastQuery PATENT RESULTS"
-            //my_toolbar.title = "${lastQuery.toUpperCase(Locale.ROOT)} PATENT RESULTS 123456789  asdf asdf asdf 123456789 asdf asdf asdf"
-            //actionBar?.title = "${lastQuery.toUpperCase(Locale.ROOT)} PATENT RESULTS"
-            my_toolbar.title = ""
-            //my_toolbar.toolBarTextView.text = "${lastQuery.toUpperCase(Locale.ROOT)} PATENT RESULTS"
-            my_toolbar.toolBarTextView.text = "PATENT RESULTS"
-
-        }
 
 
-    }*/
+    override fun onCreateView(
+        parent: View?,
+        name: String,
+        context: Context,
+        attrs: AttributeSet
+    ): View? {
+
+        connectivityManager.setUp()
+        connectivityManager.isConnectedToInternetLiveData.observe(this, Observer {
+            //TODO : do something interesting with bool value
+        })
+
+        return super.onCreateView(parent, name, context, attrs)
+    }
+
 
     private fun handleIntent(intent: Intent, bundle:Bundle) {
-        Log.d(tag, "handleIntent")
-        Log.d(tag, "intent : $intent")
+        Log.d(TAG, "handleIntent")
+        Log.d(TAG, "intent : $intent")
         val appLinkAction = intent.action
         val appLinkData: Uri? = intent.data
-        Log.d(tag, "appLinkAction : $appLinkAction")
-        Log.d(tag, "appLinkData : $appLinkData")
+        Log.d(TAG, "appLinkAction : $appLinkAction")
+        Log.d(TAG, "appLinkData : $appLinkData")
         if (Intent.ACTION_VIEW == appLinkAction) {
             appLinkData?.getQueryParameter("state").also { state ->
-                Log.d(tag, "state : $state")
-                if (state == secretString) {
+                Log.d(TAG, "state : $state")
+                val stateStored = BuildConfig.TODOIST_STATE_SECRET
+                if (state == stateStored) {
                     appLinkData?.getQueryParameter("code").also { code ->
-                        Log.d(tag, "code : $code")
+                        Log.d(TAG, "code : $code")
                         if (code != null) {
-                            //repo.getToken(code, callbackAccessToken)
                             bundle.putString(todoistActionCodeKey, code)
 
                         }
@@ -144,7 +138,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        //val navController = findNavController(R.id.fragment)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navHostID) as NavHostFragment
         val navController = navHostFragment.navController
@@ -153,24 +146,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun clearCache () {
-        Thread(Runnable {
-            Glide.get(this).clearDiskCache() //1
-        }).start()
-        Glide.get(this).clearMemory() //2
-    }
 
-    /*fun testMethodRemoveToken() {
-        val sharedPref = getSharedPreferences(sharedPreferenceName, Context.MODE_PRIVATE)
-        sharedPref.edit().remove(accessTokenKey).apply()
 
-    }
-
-    fun getToken():String? {
-
-        val sharedPref = getSharedPreferences(sharedPreferenceName, Context.MODE_PRIVATE)
-        return sharedPref?.getString(accessTokenKey, null)
-    }*/
 
 
 
