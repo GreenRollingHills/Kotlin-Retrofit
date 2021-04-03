@@ -39,8 +39,6 @@ class PatentSummary:Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //pBar.hide()
-
         data.getSpinnerStatusLiveData().observe(viewLifecycleOwner, Observer { bool ->
             view.pBar.visibility = if (bool) View.VISIBLE else View.INVISIBLE
 
@@ -59,7 +57,6 @@ class PatentSummary:Fragment() {
 
 
         toPatentWebViewButton.setOnClickListener {
-            //pBar.show()
             args.nasaData?.let { it ->  data.loadPatent(it.patentCaseNumber)}
 
         }

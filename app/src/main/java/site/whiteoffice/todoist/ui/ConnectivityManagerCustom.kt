@@ -20,15 +20,11 @@ class ConnectivityManagerCustom(
 ) :
     AndroidViewModel((application)) {
     private val DELOG_TAG: String = ConnectivityManagerCustom::class.java.simpleName
-    //private val mState: SavedStateHandle
 
     companion object {
         const val connectedToInternetKey = "connectedToInternetKey"
     }
 
-    init {
-        //registerNetworkCallback()
-    }
 
     fun  setUp () {
         registerNetworkCallback()
@@ -80,7 +76,6 @@ class ConnectivityManagerCustom(
         }
 
         override fun onLosing(network: Network, maxMsToLive: Int) {
-            //checkInternetConnection(true);
             super.onLosing(network, maxMsToLive)
             Log.d("TAG", "NetworkCallback, onLosing")
 

@@ -54,7 +54,6 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
             newProjectButtonAction()
         }
 
-        //val adapter = context?.let {ProjectListListAdapter(it, this)}
         val adapter = ProjectListListAdapter(this)
 
         data.getSpinnerStatusLiveData().observe(viewLifecycleOwner, Observer { bool ->
@@ -65,20 +64,10 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
         data.getProjects().observe(viewLifecycleOwner, Observer { list ->
             Log.d(TAG, "onViewCreated, list : $list")
 
-            //view.pBar.visibility = View.INVISIBLE
-            //val newList = returnAdapterData(list)
-            adapter?.submitList(list)
+
+            adapter.submitList(list)
 
 
-            /*data.setRecyclerViewList(list)
-
-            if (projectListRV.adapter == null) {
-                projectListRV.adapter = context?.let { ProjectListAdapter(it, args.nasaData, data.list) }
-            } else {
-                val adapter = projectListRV.adapter as ProjectListAdapter
-                adapter.update(data.list)
-
-            }*/
 
         })
 
@@ -87,8 +76,6 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
         projectListRV.layoutManager = LinearLayoutManager(context)
         projectListRV.addItemDecoration(DividerItemDecoration(context,
             DividerItemDecoration.VERTICAL))
-
-        //view.pBar.visibility = View.VISIBLE
 
         Log.d(TAG, "ProjectList, savedInstanceState : $savedInstanceState")
         if (savedInstanceState == null) {
@@ -109,20 +96,7 @@ class ProjectList : Fragment(), ProjectListListAdapter.NavigationDelegate {
         view?.findNavController()?.navigate(action)
     }
 
-    /*fun returnAdapterData(list: List<Project>):MutableList<ProjectListViewHolderData> {
 
-        val mutableList = mutableListOf<ProjectListViewHolderData>()
-
-        for (i in list.indices) {
-            val p = list[i]
-            Log.d(TAG, "p name : ${p.name}")
-
-            val data = ProjectListViewHolderData(ProjectListListAdapter.ProjectType, p)
-            mutableList.add(data)
-        }
-
-        return mutableList
-    }*/
 
 
 

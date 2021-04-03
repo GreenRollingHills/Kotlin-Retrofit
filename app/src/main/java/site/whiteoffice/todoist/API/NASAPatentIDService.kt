@@ -9,7 +9,6 @@ import site.whiteoffice.todoist.DataClasses.PatentIDResults
 interface NASAPatentIDService {
 
     @GET("geturl/{id}")
-    //fun getPatentID (@Path("id") case_number: String): Call<PatentIDResults>
     suspend fun getPatentID (@Path("id") case_number: String): Response<PatentIDResults>
 
 }

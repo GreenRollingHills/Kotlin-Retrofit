@@ -18,9 +18,4 @@ interface NASADao {
     @Query ("DELETE FROM PatentSummary")
     suspend fun deleteAllPatentSummaries()
 
-    //@Insert(onConflict = OnConflictStrategy.REPLACE)
-    //suspend fun insertAllPatentIDResults (vararg info: PatentIDResults)
-
-    //@Query("SELECT * FROM PatentIDResults")
-    //fun getAllPatentIDResults(): LiveData<List<PatentIDResults>>
 }

@@ -57,7 +57,6 @@ class QueryDialog:DialogFragment() {
         val dumper = parentFragment as ImageDump
         dumper.setCurrentQueryTitle(query)
 
-        //dumper.data.loadPatents(dumper.view?.pBar, query)
         dumper.data.loadPatents(query)
 
 

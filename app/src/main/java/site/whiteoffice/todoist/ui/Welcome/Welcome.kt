@@ -22,7 +22,6 @@ class Welcome : Fragment() {
 
     val data by viewModels<WelcomeViewModel>()
 
-    //private var todoistAction:Int = TodoistAction.getCode.raw
     private var todoistCode:String? = null
 
     companion object {
@@ -30,19 +29,11 @@ class Welcome : Fragment() {
         private val TAG = Welcome::class.java.simpleName
     }
 
-    /*enum class TodoistAction (val raw: Int) {
-        getCode (0),
-        getToken (1),
-        start(2)
-    }*/
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*arguments?.let {
 
-            todoistAction = it.getInt(MainActivity.todoistActionKey)
-            todoistCode = it.getString(MainActivity.todoistActionCodeKey)
-        }*/
 
         arguments?.let {
             if (savedInstanceState == null) {
@@ -79,11 +70,9 @@ class Welcome : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //println("todoistAction : $todoistAction")
         println("todoistCode : $todoistCode")
 
         view.loginButton.setOnClickListener {
-            //view.pBar.visibility = View.VISIBLE
             // TODO : Improve state storage per app requirements
 
             if (data.loginStatus.value == WelcomeViewModel.LoginStatus.NeedCode) {
@@ -155,26 +144,6 @@ class Welcome : Fragment() {
             }
         })
 
-        /*when (todoistAction) {
-            TodoistAction.getCode.raw -> {
-                println("do nothing")
-
-                data.setLoginStatusToNeedCode()
-            }
-
-            TodoistAction.getToken.raw -> {
-                println("get token action")
-                val code = todoistCode
-                if (code != null) {
-                    data.getToken(code)
-                }
-            }
-
-            TodoistAction.start.raw -> {
-                println("GO!")
-                data.setLoginStatusToHaveToken()
-            }
-        }*/
 
 
 

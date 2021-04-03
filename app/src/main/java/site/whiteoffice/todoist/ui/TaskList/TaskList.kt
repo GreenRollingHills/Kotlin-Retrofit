@@ -26,20 +26,12 @@ import kotlinx.android.synthetic.main.task_list.view.pBar
 
 class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
 
-    //private var projectID:Long = -1
-
-    //lateinit var data: TaskListViewModel
-
-    //val data by viewModels<TaskListViewModel>()
 
     var data:TaskListViewModel? = null
 
     val args:TaskListArgs by navArgs()
 
-    /*val model by viewModels<TaskListViewModel> {
-        //MyViewModelFactory(this, args.myId)
-        TaskListViewModelFactory(this, application, args.projectIDARG)
-    }*/
+
 
     companion object {
 
@@ -52,12 +44,9 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
 
         }
 
-        //projectID = args.projectIDARG
-
         val application = activity?.application
         if (application != null) {
             data = ViewModelProvider(this, TaskListViewModelFactory(application, args.projectIDARG)).get(TaskListViewModel::class.java)
-            //data = ViewModelProvider(this, TaskListViewModelFactory(this,application,args.projectIDARG)).get(TaskListViewModel::class.java)
 
 
 
@@ -75,8 +64,6 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //view.pBar.visibility = View.INVISIBLE
-
         view.createTaskButton.setOnClickListener {
             createTaskAction()
         }
@@ -88,23 +75,12 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
             view.pBar.visibility = if (bool) View.VISIBLE else View.INVISIBLE
 
         })
-        //        data.getTasks(projectID).observe(viewLifecycleOwner, Observer { list ->
         data?.getTasksLiveData()?.observe(viewLifecycleOwner, Observer { list ->
 
             Log.d(TAG, "taskList, onViewCreated, list : $list")
-            //view.pBar.visibility = View.INVISIBLE
-            //val newList = returnAdapterData(list)
+
             adapter.submitList(list)
 
-
-            /*data.setRecyclerViewList(list)
-
-            if (recyclerView.adapter == null) {
-                recyclerView.adapter = context?.let { TaskListAdapter(it, data.list, this) }
-            } else {
-                val adapter = recyclerView.adapter as TaskListAdapter
-                adapter.update(data.list)
-            }*/
 
 
         })
@@ -119,7 +95,6 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
         )
 
         if (savedInstanceState == null) {
-            //view.pBar.visibility = View.VISIBLE
             data?.loadTasks()
         }
     }
@@ -129,7 +104,6 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
         builder?.setTitle("Are you sure you want to delete?")
 
         builder?.setPositiveButton(android.R.string.yes) { dialog, which ->
-            //view?.pBar?.visibility = View.VISIBLE
             data?.deleteTask(taskID)
 
         }
@@ -143,7 +117,6 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
 
     private fun createTaskAction () {
 
-        //val patentName = args.nasaData?.patentName
         val patentName = args.nasaData?.patentName
 
         var content = "?"
@@ -175,26 +148,10 @@ class TaskList : Fragment(), TaskListListAdapter.DataDelegate {
     }
 
     override fun startSpinner() {
-        //view?.pBar?.visibility = View.VISIBLE
         data?.setSpinnerStatus(true)
     }
 
-    /*override fun stopSpinner() {
-        view?.pBar?.visibility = View.INVISIBLE
-    }*/
 
-    /*fun returnAdapterData(list:List<Task>):MutableList<TaskListViewHolderData> {
-
-        val mutableList = mutableListOf<TaskListViewHolderData>()
-
-        for (t in list) {
-
-            val data = TaskListViewHolderData(TaskListListAdapter.TaskType, t)
-            mutableList.add(data)
-        }
-
-        return mutableList
-    }*/
 
 
 }

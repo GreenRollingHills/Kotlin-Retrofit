@@ -75,7 +75,6 @@ class ImageDump : Fragment() {
 
             Log.d(TAG, "list : $list")
             adapter.submitList(list) {
-                //view.pBar.visibility = View.INVISIBLE
                 data.setSpinnerStatus(false)
                 (recyclerView2.layoutManager as LinearLayoutManager).scrollToPosition(0)
 
@@ -83,13 +82,12 @@ class ImageDump : Fragment() {
 
 
         })
-        
+
         val lastQuery =
             getLastQuery(activity)
         Log.d(TAG, "lastQuery : $lastQuery")
         if (lastQuery != null) {
             setCurrentQueryTitle(lastQuery)
-            //data.loadPatents(view.pBar, lastQuery)
             data.loadPatents(lastQuery)
 
         }

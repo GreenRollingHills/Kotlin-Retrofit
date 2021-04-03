@@ -9,7 +9,6 @@ interface NASAPatentInfoService {
 
     @Headers("Authorization: Bearer DEMO_KEY")
     @GET("patent/")
-    //fun getPatents (@QueryName keyword: String, @Query("api_key") key:String = "DEMO_KEY"):Call<PatentSummaryResults>
     suspend fun getPatents (@QueryName keyword: String, @Query("api_key") key:String = "DEMO_KEY"): Response<PatentSummaryResults>
 
 

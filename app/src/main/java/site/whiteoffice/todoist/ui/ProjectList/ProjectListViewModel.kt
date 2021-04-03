@@ -34,27 +34,6 @@ class ProjectListViewModel(
         spinnerStatus.value = boolean
     }
 
-    private val callbackCreateProject = object : Callback<Project> {
-        override fun onFailure(call: Call<Project>?, t: Throwable?) {
-            Log.e(TAG, "callbackCreateProject, api issue : ${t?.message}")
-            //TODO : implement error handling
-        }
-
-        override fun onResponse(call: Call<Project>?, response: Response<Project>?) {
-            response?.isSuccessful.let {
-                Log.d(TAG, "response body : ${response?.body()}")
-                val project = response?.body()
-
-                viewModelScope.launch {
-                    if (project != null) {
-                        todoistRepo.cacheProject(project)
-                    }
-                }
-
-            }
-
-        }
-    }
 
     fun getProjects (): LiveData<List<Project>> {
 
@@ -62,7 +41,6 @@ class ProjectListViewModel(
     }
 
     fun createNewProject (project:Project) {
-        //todoistRepo.createProject(project, callbackCreateProject)
         //TODO : implement error handling per app requirements
         setSpinnerStatus(true)
 
@@ -86,36 +64,7 @@ class ProjectListViewModel(
 
 
 
-    private val callbackProjectLoad = object : Callback<List<Project>> {
-        override fun onFailure(call: Call<List<Project>>?, t: Throwable?) {
-            Log.e(TAG, "callbackProjectLoad, api issue : ${t?.message}")
-            //TODO : implement error handling
-        }
-
-        override fun onResponse(call: Call<List<Project>>?, response: Response<List<Project>>?) {
-            response?.isSuccessful.let {
-                Log.d(TAG, "response body : ${response?.body()}")
-                val resultList = RepoResult(response?.body() ?: emptyList())
-
-
-
-                viewModelScope.launch {
-                    /* TODO : don't delete all projects right before I get all projects.
-                        The best way to do this is probably to use ToDoist's synch api.*/
-
-                    todoistRepo.deleteAllProjectsInRoomDB()
-                    todoistRepo.cacheAllProjects(resultList.projects)
-                }
-
-
-            }
-
-        }
-    }
-
-
     fun loadProjects () {
-        //todoistRepo.getProjects(callbackProjectLoad)
         //TODO : implement error handling per app requirements
         setSpinnerStatus(true)
 
@@ -132,7 +81,6 @@ class ProjectListViewModel(
                     The best way to do this is probably to use ToDoist's synch api.*/
 
                 todoistRepo.deleteAllProjectsInRoomDB()
-                //todoistRepo.cacheAllProjects(resultList.projects)
                 todoistRepo.cacheAllProjects(repoResult.projects)
 
             }

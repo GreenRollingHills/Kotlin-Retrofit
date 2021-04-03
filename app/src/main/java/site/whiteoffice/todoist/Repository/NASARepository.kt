@@ -44,9 +44,7 @@ class NASARepository (
 
     }
 
-    //    fun getPatentSummaryResults(keyword:String, callback: Callback<PatentSummaryResults>) {
     suspend fun getPatentSummaryResults(keyword:String): Response<PatentSummaryResults> {
-        //service_info.getPatents(keyword).enqueue(callback)
         return service_info.getPatents(keyword)
 
     }
@@ -64,9 +62,7 @@ class NASARepository (
         AppDatabase.getInstance(application).nasaDao.deleteAllPatentSummaries()
     }
 
-    //    fun getPatentID(case_number: String, callback: Callback<PatentIDResults>) {
     suspend fun getPatentID(case_number: String) : Response<PatentIDResults> {
-        //service_patentID.getPatentID(case_number).enqueue(callback)
         return service_patentID.getPatentID(case_number)
 
     }

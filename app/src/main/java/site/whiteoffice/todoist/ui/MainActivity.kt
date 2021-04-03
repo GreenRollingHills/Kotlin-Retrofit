@@ -30,12 +30,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    val connectivityManager by viewModels<ConnectivityManagerCustom>()
+    private val connectivityManager by viewModels<ConnectivityManagerCustom>()
 
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
-        //val todoistActionKey = "todoistActionKey"
         const val welcomeLoginStatusKey = "welcomeLoginStatusKey"
         const val todoistActionCodeKey = "todoistActionCodeKey"
 
@@ -57,23 +56,19 @@ class MainActivity : AppCompatActivity() {
         val bundle = Bundle()
 
         if (intent != null && intent.action == Intent.ACTION_MAIN) {
-            //testMethodRemoveToken(application)
             val tokenStored =
                 getTokenFromSharedPreferences(
                     application
                 )
             if (tokenStored == null) {
-                //bundle.putInt(todoistActionKey, Welcome.TodoistAction.getCode.raw)
                 bundle.putInt(welcomeLoginStatusKey, WelcomeViewModel.LoginStatus.NeedCode.raw)
 
             } else {
-                //bundle.putInt(todoistActionKey, Welcome.TodoistAction.start.raw)
                 bundle.putInt(welcomeLoginStatusKey, WelcomeViewModel.LoginStatus.HaveToken.raw)
 
             }
 
         } else if (intent != null && intent.action == Intent.ACTION_VIEW) { //category = BROWSABLE
-            //bundle.putInt(todoistActionKey, Welcome.TodoistAction.getToken.raw)
             bundle.putInt(welcomeLoginStatusKey, WelcomeViewModel.LoginStatus.NeedTokenActive.raw)
             handleIntent(intent, bundle)
 

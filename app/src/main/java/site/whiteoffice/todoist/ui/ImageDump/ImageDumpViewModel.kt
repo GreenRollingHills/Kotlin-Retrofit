@@ -24,18 +24,6 @@ class ImageDumpViewModel (
 
     }
 
-    fun getTest ():Int? {
-        var result = savedStateHandle.get<Int>("key")
-        if (result == null) {
-            result = 0
-        } else {
-            result += 1
-        }
-
-        savedStateHandle.set("key", result)
-        return savedStateHandle.get("key")
-
-    }
 
     private var spinnerStatus = MutableLiveData<Boolean>(false)
 
@@ -51,56 +39,9 @@ class ImageDumpViewModel (
         return repo.getPatentSummariesLiveData()
     }
 
-    private val callback = object : Callback<PatentSummaryResults> {
-        override fun onFailure(call: Call<PatentSummaryResults>?, t: Throwable?) {
-            Log.e(TAG, "callback, api issue : ${t?.message}")
-            //TODO : implement error handling
-
-            if (call != null && call.isCanceled) {
-
-            } else {
-
-            }
 
 
-
-        }
-
-        override fun onResponse(call: Call<PatentSummaryResults>?, response: Response<PatentSummaryResults>?) {
-            response?.isSuccessful.let {
-                Log.d(TAG, "response body : ${response?.body()}")
-
-
-                response?.body()?.results?.let {results ->
-
-                    viewModelScope.launch {
-                        val tempList = mutableListOf<PatentSummary>()
-                        for (patent in results) {
-
-                            val data = PatentSummary(patent[2],
-                                patent[patent.size-3], patent[3], patent[1])
-
-                            tempList.add(data)
-
-                        }
-                        Log.d(TAG, "tempList after : $tempList")
-                        repo.removeAllPatentSummariesFromRoomDB()
-                        repo.cachePatentSummaries(tempList)
-                    }
-
-
-                }
-
-
-            }
-
-        }
-    }
-
-    //    fun loadPatents (spinner: ProgressBar?, keyword:String) {
     fun loadPatents (keyword:String) {
-        //spinner?.visibility = View.VISIBLE
-        //repo.getPatentSummaryResults(keyword, callback)
         //TODO : implement error handling per app requirements
 
         setSpinnerStatus(true)

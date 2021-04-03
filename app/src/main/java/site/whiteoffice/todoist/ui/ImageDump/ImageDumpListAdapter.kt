@@ -82,7 +82,6 @@ class ImageDumpListAdapter () : ListAdapter<PatentSummary, ImageDumpListAdapter.
             .inflate(R.layout.image_dump_card_view, parent, false)
         return ImageDumpViewHolder(view)
     }
-    //-----------onCreateViewHolder: bind view with data model---------
     override fun onBindViewHolder(holder: ImageDumpViewHolder, position: Int) {
         Log.d(TAG, "onBindViewHolder")
         Log.d(TAG, "position : $position")
@@ -106,9 +105,6 @@ class ImageDumpListAdapter () : ListAdapter<PatentSummary, ImageDumpListAdapter.
     class DiffCallback : DiffUtil.ItemCallback<PatentSummary>() {
 
         override fun areItemsTheSame(oldItem: PatentSummary, newItem: PatentSummary): Boolean {
-            //Log.d(TAG, "are items same")
-            //Log.d(TAG, "old : $oldItem , newItem : $newItem")
-            //Log.d(TAG, "return ${oldItem.patentCaseNumber == newItem.patentCaseNumber}")
             return oldItem.patentCaseNumber == newItem.patentCaseNumber
         }
 
@@ -116,9 +112,6 @@ class ImageDumpListAdapter () : ListAdapter<PatentSummary, ImageDumpListAdapter.
             oldItem: PatentSummary,
             newItem: PatentSummary
         ): Boolean {
-            //Log.d(TAG, "areContentsTheSame")
-            //Log.d(TAG, "old : $oldItem , newItem : $newItem")
-            //Log.d(TAG, "return ${oldItem.patentCaseNumber == newItem.patentCaseNumber}")
             return oldItem.patentCaseNumber == newItem.patentCaseNumber
         }
 
