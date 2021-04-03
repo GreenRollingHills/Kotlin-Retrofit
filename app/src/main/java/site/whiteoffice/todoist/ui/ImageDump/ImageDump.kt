@@ -83,9 +83,7 @@ class ImageDump : Fragment() {
 
 
         })
-
-        Log.d(TAG, "test value : ${data.getTest()}")
-
+        
         val lastQuery =
             getLastQuery(activity)
         Log.d(TAG, "lastQuery : $lastQuery")
