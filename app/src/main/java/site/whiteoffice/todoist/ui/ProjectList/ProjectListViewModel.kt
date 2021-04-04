@@ -30,7 +30,7 @@ class ProjectListViewModel(
         return spinnerStatus
     }
 
-    fun setSpinnerStatus (boolean: Boolean) {
+    private fun setSpinnerStatus (boolean: Boolean) {
         spinnerStatus.value = boolean
     }
 
