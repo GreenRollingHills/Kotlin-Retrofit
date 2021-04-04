@@ -77,8 +77,9 @@ class ProjectListViewModel(
             val response = todoistRepo.getProjects()
             response.body()?.let { list ->
                 val repoResult = RepoResult(list)
-                /* TODO : don't delete all projects right before I get all projects.
-                    The best way to do this is probably to use ToDoist's synch api.*/
+
+                /** because I don't auto synch todoist account with this app I need to
+                delete all projects before I load all projects */
 
                 todoistRepo.deleteAllProjectsInRoomDB()
                 todoistRepo.cacheAllProjects(repoResult.projects)

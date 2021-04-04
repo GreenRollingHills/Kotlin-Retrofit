@@ -9,7 +9,7 @@ import site.whiteoffice.todoist.DataClasses.PatentSummaryResults
 @Dao
 interface NASADao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertAllPatentSummaries (vararg patentSummary: PatentSummary)
 
     @Query("SELECT * FROM PatentSummary")

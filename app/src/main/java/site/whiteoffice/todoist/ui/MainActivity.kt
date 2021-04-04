@@ -51,8 +51,6 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.navHostID) as NavHostFragment
         val navController = navHostFragment.navController
 
-        Log.d(TAG, "intent : $intent")
-
         val bundle = Bundle()
 
         if (intent != null && intent.action == Intent.ACTION_MAIN) {
@@ -68,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-        } else if (intent != null && intent.action == Intent.ACTION_VIEW) { //category = BROWSABLE
+        } else if (intent != null && intent.action == Intent.ACTION_VIEW) {
             bundle.putInt(welcomeLoginStatusKey, WelcomeViewModel.LoginStatus.NeedTokenActive.raw)
             handleIntent(intent, bundle)
 
@@ -110,18 +108,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleIntent(intent: Intent, bundle:Bundle) {
         Log.d(TAG, "handleIntent")
-        Log.d(TAG, "intent : $intent")
         val appLinkAction = intent.action
         val appLinkData: Uri? = intent.data
-        Log.d(TAG, "appLinkAction : $appLinkAction")
-        Log.d(TAG, "appLinkData : $appLinkData")
         if (Intent.ACTION_VIEW == appLinkAction) {
             appLinkData?.getQueryParameter("state").also { state ->
-                Log.d(TAG, "state : $state")
                 val stateStored = BuildConfig.TODOIST_STATE_SECRET
                 if (state == stateStored) {
                     appLinkData?.getQueryParameter("code").also { code ->
-                        Log.d(TAG, "code : $code")
                         if (code != null) {
                             bundle.putString(todoistActionCodeKey, code)
 

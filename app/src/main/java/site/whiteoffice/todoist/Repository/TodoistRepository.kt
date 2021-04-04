@@ -1,6 +1,7 @@
 package site.whiteoffice.todoist.Repository
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -146,11 +147,15 @@ class TodoistRepository (
 
     }
 
+    suspend fun deleteTaskFromDB(id:String) {
+        AppDatabase.getInstance(application).todoistDao.deleteTask(id)
+    }
+
     suspend fun deleteAllTasksInRoomDB () {
         AppDatabase.getInstance(application).todoistDao.deleteAllTasks()
 
     }
-    
+
 
 
     //endregion

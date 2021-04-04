@@ -11,6 +11,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import site.whiteoffice.todoist.DataClasses.Task
 import site.whiteoffice.todoist.Repository.TodoistRepository
+import java.lang.Exception
 
 class TaskListViewModel(
     application: Application,
@@ -49,9 +50,8 @@ class TaskListViewModel(
             val response = repo.getTasks(projectID)
 
             response.body()?.let { list ->
-                /* TODO : don't delete all tasks right before I cache all tasks.
-                The best way to do this is probably to use ToDoist's synch api. */
-
+                /** because I don't auto synch todoist account with this app I need to
+                delete all tasks before I load all tasks */
                 repo.deleteAllTasksInRoomDB()
                 repo.cacheAllTasks(list)
             }
@@ -81,7 +81,9 @@ class TaskListViewModel(
 
         viewModelScope.launch (errorHandler) {
             val response = repo.deleteTask(id)
-            loadTasks()
+            if (response.isSuccessful) {
+                repo.deleteTaskFromDB(id)
+            }
             setSpinnerStatus(false)
 
         }
@@ -121,7 +123,9 @@ class TaskListViewModel(
 
         viewModelScope.launch (errorHandler) {
             val response = repo.closeTask(taskID)
-            loadTasks()
+            if (response.isSuccessful) {
+                repo.deleteTaskFromDB(taskID)
+            }
             setSpinnerStatus(false)
 
         }
